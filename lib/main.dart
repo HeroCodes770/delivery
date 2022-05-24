@@ -24,36 +24,51 @@ class MapSample extends StatefulWidget {
 class MapSampleState extends State<MapSample> {
   Completer<GoogleMapController> _controller = Completer();
   TextEditingController toLocationController = TextEditingController();
+  double? lat;
+  double? lng;
+
+  Set<Marker> _marker = Set<Marker>();
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
     zoom: 14.4746,
   );
 
-  final Marker _kmarker = const Marker(
-      markerId: MarkerId("TravelMarkerId1"),
-      icon: BitmapDescriptor.defaultMarker,
-      position: LatLng(37.42796133580664, -122.085749655962));
+  // final Marker _kmarker = const Marker(
+  //     markerId: MarkerId("TravelMarkerId1"),
+  //     icon: BitmapDescriptor.defaultMarker,
+  //     position: LatLng(37.42796133580664, -122.085749655962));
 
-  final Marker _kSecondmarker = Marker(
-      markerId: const MarkerId("TravelMarkerId2"),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-      position: const LatLng(37.43296265331129, -122.08832357078792));
+  // final Marker _kSecondmarker = Marker(
+  //     markerId: const MarkerId("TravelMarkerId2"),
+  //     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+  //     position: const LatLng(37.43296265331129, -122.08832357078792));
 
-  static final CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
+  // static Polyline kPolyline = const Polyline(
+  //     polylineId: PolylineId('polylineId'),
+  //     points: [
+  //       LatLng(37.43296265331129, -122.08832357078792),
+  //       LatLng(37.42796133580664, -122.085749655962)
+  //     ],
+  //     width: 4,
+  //     color: Colors.blue);
 
-  static Polyline kPolyline = const Polyline(
-      polylineId: PolylineId('polylineId'),
-      points: [
-        LatLng(37.43296265331129, -122.08832357078792),
-        LatLng(37.42796133580664, -122.085749655962)
-      ],
-      width: 4,
-      color: Colors.blue);
+  @override
+  void initState() {
+    _setMarker(LatLng(37.42796133580664, -122.085749655962));
+    super.initState();
+  }
+
+  void _setMarker(LatLng positions) {
+    setState(
+      () {
+        _marker.add(
+            Marker(
+              icon: BitmapDescriptor.defaultMarker,
+              markerId: const MarkerId('TestAppId'), position: positions));
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,10 +122,17 @@ class MapSampleState extends State<MapSample> {
   }
 
   Future<void> _goToPlace(Map<String, dynamic> place) async {
-    final double lat = place['geometry']['location']['lat'];
-    final double lng = place['geometry']['location']['lng'];
+     final double latitudes = place['geometry']['location']['lat'];
+     lat = latitudes;
+     final double longitudes = place['geometry']['location']['lng'];
+     lng = longitudes;
     final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: LatLng(lat, lng), zoom: 12)));
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: LatLng(lat!, lng!), zoom: 12),
+      ),
+    );
+
+    _setMarker(LatLng(lat!, lng!));
   }
 }
